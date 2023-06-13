@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ore-Xray</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="menu">
+    <img src="images/Johan%20logo.jpg" class="profile-img" alt="Johan's Logo">
+    
+    <ul>
+      <li><a href="Home.html">Home</a></li>
+      <li><a href="About.html">About</a></li>
+      <li><a href="Projects.html">Projects</a></li>
+      <!-- Add more pages here as needed -->
+    </ul>
+    
+    <div class="contact">
+      <a href="https://github.com/JohanArpin"><img src="images/github-logo.png" alt="Github"></a>
+      <a href="https://discord.com/users/810632814441660426"><img src="images/discord-logo.png" alt="Discord"></a>
+      <a href="https://www.instagram.com/johanarpin/"><img src="images/instagram-logo.jpg" alt="Instagram"></a>
+    </div>
+  </div>
+  
+  <div class="content">
+    <h1>Ore-Xray</h1>
+    <pre>// ==UserScript==
+// @name         XRAY with Wireframe Texture (Limited Range)
+// @namespace    http://tampermonkey.net/
+// @version      0.1
+// @description  try to take over the world!
+// @author       You
+// @match        https://voxiom.io/*
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=voxiom.io
+// @grant        none
+// @require      https://cdnjs.cloudflare.com/ajax/libs/three.js/0.151.3/three.min.js
+// ==/UserScript==
+
+new modLoader.MOD({ author: "ExplodIng_Andrey#6886", version: "1.0", name: "XRAY with Wireframe Texture" }, function () {
+  var wireframeTexture = new THREE.MeshBasicMaterial({ color: "", transparent: true, opacity: 0.5, wireframe: true });
+  var xrayMode = false; // Initialize the XRAY mode as false
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key == "o" || event.key == "n") { // Check for both "o" and "n" keys
+      xrayMode = !xrayMode; // Toggle the XRAY mode
+      if (xrayMode) {
+        if (event.key == "o") {
+          handleXray(17, "green");
+        } else if (event.key == "n") {
+          handleXray(20, "grey");
+        }
+      } else {
+        clearXray();
+      }
+    }
+  });
+
+  function handleXray(blockId, color) {
+    if (window.group) window.group.removeFromParent();
+    window.group = new THREE.Object3D();
+    game.scene.add(group);
+    var position = game.camera.position.clone();
+    var range = 30; // Adjust the range as needed
+    game.chunks.forEach(function (chunk) {
+      chunk.blocks.forEach(function (block, index) {
+        if (block == blockId) {
+          var pos = chunk.getBlockPositionAtIndex(index);
+          var newPos = new THREE.Vector3().copy(pos).multiplyScalar(0.5); // Apply the scaling factor
+          if (position.distanceTo(newPos) <= range) {
+            var mesh = new THREE.Mesh(new THREE.BoxGeometry(), wireframeTexture); // Use the wireframe texture
+            group.add(mesh);
+            mesh.position.copy(newPos);
+            mesh.scale.set(0.5, 0.5, 0.5); // Scale the mesh
+            mesh.position.addScalar(0.25);
+            mesh.material.color.set(color);
+            mesh.material.depthTest = false;
+            mesh.material.fog = false;
+          }
+        }
+      });
+    });
+  }
+
+  function clearXray() {
+    if (window.group) {
+      window.group.removeFromParent();
+      window.group = null;
+    }
+  }
+});
+    </pre>
+  </div>
+</body>
+</html>
